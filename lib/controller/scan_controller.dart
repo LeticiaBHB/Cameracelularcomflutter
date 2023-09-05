@@ -16,7 +16,7 @@ class ScanController extends GetxController {
   }
 
   late CameraController cameraController;
-  late List<CameraDescription> cameras; // Change variable name to 'cameras'
+  late List<CameraDescription> cameras;
 
   var isCameraInitialized = false.obs;
 
@@ -32,7 +32,29 @@ class ScanController extends GetxController {
       isCameraInitialized(true);
       update();
     } else {
-      print('permission denied');
+      print('Permission denied');
     }
+  }
+
+  void trocarCamera() async {
+    if (cameras.length < 2) {
+      // Não há câmeras suficientes para alternar
+      return;
+    }
+
+    // Verifique a câmera atualmente ativa
+    int cameraIndex = cameras.indexOf(cameraController.description);
+
+    // Calcule o índice da próxima câmera
+    int nextCameraIndex = (cameraIndex + 1) % cameras.length;
+
+    // Troque para a próxima câmera
+    await cameraController.dispose();
+    cameraController = CameraController(
+      cameras[nextCameraIndex],
+      ResolutionPreset.max,
+    );
+    await cameraController.initialize();
+    update();
   }
 }
