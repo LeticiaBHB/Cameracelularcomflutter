@@ -9,6 +9,7 @@ class CameraView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       body: SafeArea(
         child: Center(
           child: OrientationBuilder(
@@ -18,7 +19,7 @@ class CameraView extends StatelessWidget {
               if (orientation == Orientation.portrait) {
                 aspectRatio = 3.0 / 4.0; // Exemplo de relação de aspecto para retrato
               } else {
-                aspectRatio = 4.0 / 3.0; // Exemplo de relação de aspecto para paisagem
+                aspectRatio = 4.0 / 0.5; // Exemplo de relação de aspecto para paisagem
               }
 
               return Column(
@@ -26,7 +27,7 @@ class CameraView extends StatelessWidget {
                 children: [
                   if (orientation == Orientation.portrait)
                     Container(
-                      child: Text('Câmera inteligente!', textAlign: TextAlign.center),
+                      child: Text('Câmera inteligente!', textAlign: TextAlign.center, style: TextStyle(color: Colors.white),),
                     ),
                   GetBuilder<ScanController>(
                     init: ScanController(),
