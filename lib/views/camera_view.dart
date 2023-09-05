@@ -1,60 +1,67 @@
 import 'package:camera/camera.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_state_manager/src/simple/get_state.dart';
+import 'package:objectdetect/controller/scan_controller.dart';
 
-class ScanController extends GetxController {
-  @override
-  void onInit() {
-    super.onInit();
-    initCamera();
-  }
+class CameraView extends StatelessWidget {
+  const CameraView({super.key});
 
   @override
-  void dispose() {
-    super.dispose();
-    cameraController.dispose();
-  }
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        child: Center(
+          child: OrientationBuilder(
+            builder: (context, orientation) {
+              // Determine a relação de aspecto com base na orientação da tela
+              double aspectRatio = 1.0;
+              if (orientation == Orientation.portrait) {
+                aspectRatio = 3.0 / 4.0; // Exemplo de relação de aspecto para retrato
+              } else {
+                aspectRatio = 4.0 / 0.5; // Exemplo de relação de aspecto para paisagem
+              }
 
-  late CameraController cameraController;
-  late List<CameraDescription> cameras;
-
-  var isCameraInitialized = false.obs;
-
-  initCamera() async {
-    if (await Permission.camera.request().isGranted) {
-      cameras = await availableCameras();
-
-      cameraController = CameraController(
-        cameras[0],
-        ResolutionPreset.max,
-      );
-      await cameraController.initialize();
-      isCameraInitialized(true);
-      update();
-    } else {
-      print('Permission denied');
-    }
-  }
-
-  void trocarCamera() async {
-    if (cameras.length < 2) {
-      // Não há câmeras suficientes para alternar
-      return;
-    }
-
-    // Verifique a câmera atualmente ativa
-    int cameraIndex = cameras.indexOf(cameraController.description);
-
-    // Calcule o índice da próxima câmera
-    int nextCameraIndex = (cameraIndex + 1) % cameras.length;
-
-    // Troque para a próxima câmera
-    await cameraController.dispose();
-    cameraController = CameraController(
-      cameras[nextCameraIndex],
-      ResolutionPreset.max,
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (orientation == Orientation.portrait)
+                    Row(
+                      children: [
+                        Container(
+                          child: Text('Câmera inteligente!', textAlign: TextAlign.center, style: TextStyle(color: Colors.white),),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            ScanController scanController = Get.find<ScanController>(); // Obtém o controle da câmera
+                            scanController.trocarCamera(); // Chama a função para trocar a câmera
+                          },
+                          child: Icon(Icons.switch_camera), // Ícone para mudar a câmera
+                        ),
+                      ],
+                    ),
+                  GetBuilder<ScanController>(
+                    init: ScanController(),
+                    builder: (controller) {
+                      return controller.isCameraInitialized.value
+                          ? Expanded(
+                            child: AspectRatio(
+                        aspectRatio: aspectRatio, // Usando a relação de aspecto calculada
+                        child: CameraPreview(controller.cameraController),
+                      ),
+                          )
+                          : const Center(child: Text('Carregando visualização...'));
+                    },
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
     );
-    await cameraController.initialize();
-    update();
   }
 }
+
