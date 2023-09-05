@@ -29,6 +29,7 @@ class CameraView extends StatelessWidget {
                 children: [
                   if (orientation == Orientation.portrait)
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
                           child: Text('Câmera inteligente!', textAlign: TextAlign.center, style: TextStyle(color: Colors.white),),
@@ -38,7 +39,9 @@ class CameraView extends StatelessWidget {
                             ScanController scanController = Get.find<ScanController>(); // Obtém o controle da câmera
                             scanController.trocarCamera(); // Chama a função para trocar a câmera
                           },
-                          child: Icon(Icons.switch_camera), // Ícone para mudar a câmera
+                          style: ElevatedButton.styleFrom(primary: Colors.black),
+                          child: Icon(Icons.switch_camera, color: Colors.white,), // Ícone para mudar a câmera
+
                         ),
                       ],
                     ),
